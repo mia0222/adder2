@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歩数計算プログラム</title>
+</head>
+<body>
+
+<h1>歩数計算プログラム</h1>
+
+<button onclick="startCounting()">スタート</button>
+<button onclick="stopCounting()">ストップ</button>
+
+<p id="stepCount">歩数: 0</p>
+
+<script>
+let isRunning = false;
+let stepCount = 0;
+let intervalId;
+
+function startCounting() {
+    if (!isRunning) {
+        isRunning = true;
+        intervalId = setInterval(updateStepCount, 1000); // 1秒ごとに更新
+    }
+}
+
+function stopCounting() {
+    if (isRunning) {
+        isRunning = false;
+        clearInterval(intervalId);
+    }
+}
+
+function updateStepCount() {
+    if (isRunning) {
+        stepCount++;
+        document.getElementById("stepCount").innerText = "歩数: " + stepCount;
+    }
+}
+</script>
+
+</body>
+</html>
