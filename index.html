@@ -1,45 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>歩数計算プログラム</title>
+  <meta charset="UTF-8">
+  <title>歩数計算プログラム</title>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
 <body>
+  <h1>歩数計算プログラム</h1>
 
-<h1>歩数計算プログラム</h1>
+  <div id="accelerometer">
+    <p>X: <span id="x"></span></p>
+    <p>Y: <span id="y"></span></p>
+    <p>Z: <span id="z"></span></p>
+  </div>
 
-<button onclick="startCounting()">スタート</button>
-<button onclick="stopCounting()">ストップ</button>
+  <div id="deviceorientation">
+    <p>北極方向に対する向き: <span id="dir"></span></p>
+    <p>前後の傾き角度: <span id="fb"></span></p>
+    <p>左右の傾き角度: <span id="lr"></span></p>
+  </div>
 
-<p id="stepCount">歩数: 0</p>
+  <p>歩数: <span id="stepCount">0</span></p>
 
-<script>
-let isRunning = false;
-let stepCount = 0;
-let intervalId;
+  <button onclick="startSensor()">Start Sensor</button>
 
-function startCounting() {
-    if (!isRunning) {
-        isRunning = true;
-        intervalId = setInterval(updateStepCount, 1000); // 1秒ごとに更新
+  <script>
+    let isRunning = false;
+    let stepCount = 0;
+
+    function startSensor() {
+      DeviceOrientationEvent.requestPermission().then(function (response) {
+        if (response === 'granted') {
+          window.addEventListener("deviceorientation", handleOrientation);
+          isRunning = true;
+        }
+      }).catch(function (e) {
+        console.log(e);
+      });
     }
-}
 
-function stopCounting() {
-    if (isRunning) {
-        isRunning = false;
-        clearInterval(intervalId);
-    }
-}
+    function handleOrientation(e) {
+      e.preventDefault();
 
-function updateStepCount() {
-    if (isRunning) {
+      var dir = e.alpha;   // 北極方向に対する向きの角度
+      var fb = e.beta;      // 前後の傾き角度
+      var lr = e.gamma;     // 左右の傾き角度
+
+      document.getElementById("dir").innerText = dir.toFixed(2);
+      document.getElementById("fb").innerText = fb.toFixed(2);
+      document.getElementById("lr").innerText = lr.toFixed(2);
+
+      // 歩数を計算（Z軸の回転角度が閾値を超えたら歩数を増やす）
+      if (Math.abs(lr) > 30) {
         stepCount++;
-        document.getElementById("stepCount").innerText = "歩数: " + stepCount;
+        document.getElementById("stepCount").innerText = stepCount;
+      }
     }
-}
-</script>
-
+  </script>
 </body>
 </html>
